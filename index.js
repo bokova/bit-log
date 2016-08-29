@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express');
 var exphbr = require('express-handlebars');
 var serveStatic = require('serve-static');
@@ -5,22 +7,11 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var knex = require('knex');
 var mysql = require('mysql');
+var db = require("./db.js").db;
+
 var app = express();
 
 
-// move to external file, hide via .gitignore
-var db = knex({
-  client: 'mysql',
-  connection: {
-    host     : '127.0.0.1',
-    user     : 'bit_351n3isdk5',
-    password : '1Yv7CXpm2zDvbSkA',
-    database : 'bitstarter_d654jnd'
-  }
-});
-// user table:
-// users_58620
-// test user & pass : testmysql
 
 
 app.engine('html', exphbr({
@@ -100,10 +91,10 @@ app.post('/login', function (req, res) {
 		// if res === true
 		req.session.logged_in = true;
 		res.redirect('/admin');
-		
+
 	});
 
- -> Returns true if they match, false otherwise.
+ // -> Returns true if they match, false otherwise.
 
 	// Normally, this would be done by checking the user information which is stored in a database.
 	// For simplicity, we did things this way (the wrong way).
