@@ -5,8 +5,8 @@ var exphbr = require('express-handlebars');
 var serveStatic = require('serve-static');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-var knex = require('knex');
-var mysql = require('mysql');
+// var knex = require('knex');
+// var mysql = require('mysql');
 var db = require("./db.js").db;
 
 var app = express();
