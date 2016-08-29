@@ -6,17 +6,21 @@ var session = require('express-session');
 var knex = require('knex');
 var mysql = require('mysql');
 var app = express();
-/*
+
+
+// move to external file, hide via .gitignore
 var db = knex({
   client: 'mysql',
   connection: {
     host     : '127.0.0.1',
-    user     : 'database_user',
-    password : 'database_password',
-    database : 'bitstarter_users'
+    user     : 'bit_351n3isdk5',
+    password : '1Yv7CXpm2zDvbSkA',
+    database : 'bitstarter_d654jnd'
   }
 });
-*/
+// user table:
+// users_58620
+// test user & pass : testmysql
 
 
 app.engine('html', exphbr({
@@ -79,6 +83,27 @@ var logins = [
 app.post('/login', function (req, res) {
 
 	var allowed = false;
+
+	// Check against the DB
+
+	// check if user exists
+
+	// if so, fetch his pass hash
+
+	// compare password with hash
+	bcrypt.compareHashSync(userPassword, hash,  function(err, res) {
+		if (!res) {
+			return res.redirect('/login?error=wrong_login');
+
+		}
+
+		// if res === true
+		req.session.logged_in = true;
+		res.redirect('/admin');
+		
+	});
+
+ -> Returns true if they match, false otherwise.
 
 	// Normally, this would be done by checking the user information which is stored in a database.
 	// For simplicity, we did things this way (the wrong way).
