@@ -1,0 +1,8 @@
+# DB access config
+host     : '127.0.0.1'
+user     : 'username'
+password : 'password'
+database : 'database_name'
+# config the names of all tables used
+tables:
+ users: 'users_table_name'

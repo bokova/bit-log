@@ -5,13 +5,11 @@ var exphbr = require('express-handlebars');
 var serveStatic = require('serve-static');
 var bodyParser = require('body-parser');
 var session = require('express-session');
-// var knex = require('knex');
-// var mysql = require('mysql');
-var db = require("./db.js").db;
+var bcrypt = require('bcrypt');
+var db = require("./common.js").db;
+var config = require("./common.js").config;
 
 var app = express();
-
-
 
 
 app.engine('html', exphbr({
@@ -22,25 +20,24 @@ app.engine('html', exphbr({
 app.set('view engine', 'html');
 
 // Middleware to parse the data sent by the browser to the server.
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+	extended: false
+}));
 
 app.use(session({
-	secret: 'whatever', 
+	secret: 'whatever',
 	resave: false,
 	saveUninitialized: true
 }));
 
-// BTW: how would you actually store the secret in a real-world scenario, if the source code is on github?
-// in a standalone js file that's not shared, or?
-
 app.use(serveStatic(__dirname + '/public'));
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
 	res.render('home');
 });
 
 // The route for the admin page.
-app.get('/admin', function (req, res) {
+app.get('/admin', function(req, res) {
 
 	if (!req.session.logged_in) {
 		res.redirect('/login');
@@ -52,70 +49,46 @@ app.get('/admin', function (req, res) {
 
 
 // The route for the login page.
-app.get('/login', function (req, res) {
+app.get('/login', function(req, res) {
 	res.render('login');
 });
 
-
-// this needs to go and get replaced by a DB connection
-var logins = [
-	{
-		username: 'test',
-		password: 'test'
-	},
-	{
-		username: 'test2',
-		password: 'test2'
-	}
-];
-
-
 // The route for the login form submission.
-app.post('/login', function (req, res) {
+app.post('/login', function(req, res) {
 
 	var allowed = false;
 
-	// Check against the DB
+	// Checks against the DB if the username exists
+	db.select()
+		.where('username', req.body.username)
+		.from(config.tables.users)
+		.limit(1)
+		.then(function(results) {
 
-	// check if user exists
+			if (results.length) {
+				// The username exists. Compares the provided password with the stored hash
+				bcrypt.compare(req.body.password, results[0].password, function(err, result) {
+					if (err) {
+						console.log(err);
+					} else {
+						// If the hash and pass doesn't match:
+						if (!result) {
+							return res.redirect('/login?error=wrong_login');
+						}
 
-	// if so, fetch his pass hash
+						// If the hash and pass matches
+						req.session.logged_in = true;
+						allowed = true; // do we still need this?
+						res.redirect('/admin');
+					}
 
-	// compare password with hash
-	bcrypt.compareHashSync(userPassword, hash,  function(err, res) {
-		if (!res) {
-			return res.redirect('/login?error=wrong_login');
+				});
 
-		}
-
-		// if res === true
-		req.session.logged_in = true;
-		res.redirect('/admin');
-
-	});
-
- // -> Returns true if they match, false otherwise.
-
-	// Normally, this would be done by checking the user information which is stored in a database.
-	// For simplicity, we did things this way (the wrong way).
-	logins.forEach(function(login) {
-		if (
-			login.username === req.body.username &&
-			login.password === req.body.password
-		) {
-			allowed = true;
-		}
-	});
-
-	if (!allowed) {
-		return res.redirect('/login?error=wrong_login');
-	}
-
-	// They are allowed.
-
-	// We set a session variable here, so that we know the session is authenticated.
-	req.session.logged_in = true;
-	res.redirect('/admin');
+			} else {
+				// In case the username doesn't exist in the DB
+				return res.redirect('/login?error=wrong_login');
+			}
+		}).catch(console.log);
 });
 
 // The route for logging out.
@@ -129,8 +102,7 @@ app.get('/logout', function(req, res) {
 
 
 
-
-app.listen(3000, function () {
+app.listen(3000, function() {
 	console.log('Example app listening on port 3000!');
 });
 

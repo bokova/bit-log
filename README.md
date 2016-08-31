@@ -23,8 +23,12 @@ Both have pretty straight forward setup guides so getting them working shouldn't
 
 1. After you get these 2 things working, you have to go to [https://github.com/Learn-by-doing/bitstarter](https://github.com/Learn-by-doing/bitstarter) and fork the git repository using these instructions [https://help.github.com/articles/fork-a-repo/](https://help.github.com/articles/fork-a-repo/)
 
-2. navigate to your project directory and run ```npm install``` to install all the dependencies required by the project
+2. Navigate to your project directory and run ```npm install``` to install all the dependencies required by the project
 
-3. Run ```node index.js```
+3. Setup a MySQL database to store usernames, passwords, etc. If you don't have MySQL, you could use the XAMPP (Widnows, OSX, Linux, [https://www.apachefriends.org/index.html](https://www.apachefriends.org/index.html)) or MAMP (OSX, [https://bitnami.com/stack/mamp](https://bitnami.com/stack/mamp)) installer. Make sure you've setup a MySQL user for the application as well
+
+4. Create a config file by copying ```/config/db.yml.example``` to ```/config/db.yml``` and filling in your DB, username and table config
+
+5. Run ```node index.js```
 
 That's it!
